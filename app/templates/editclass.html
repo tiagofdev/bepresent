@@ -1,0 +1,538 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="grid-x grid-padding-x align-center-middle" >
+    <div class="cell large-8">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <ul class="menu">
+                    <li class="menu-text">Edit Class</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="editclassform" name="editclassform" method="POST">
+<div class="grid-x grid-padding-x align-center" style="margin-top:10px;">
+    <div class="cell medium-6 large-4">
+        <label>Class Name
+            <input type="text" name="class_name" id="class_name" placeholder="" {%if pre[1]%}value="{{pre[1]}}"{%endif%}
+                   size="20" maxlength="44" required>
+        </label>
+        <p id="class_name_message" style="color:red;">{% if message %} {{message}} {% endif %}</p>
+        <label>Days of the week
+            <ul style="list-style-type:none;">
+                <li><input type="checkbox" name="sunday" id="sunday" value="1" {%if pre[2]%}checked{%endif%}>
+                    <label for="sunday">Sunday</label></li>
+                <li><input type="checkbox" name="monday" id="monday" value="1" {%if pre[3]%}checked{%endif%}>
+                    <label for="monday">Monday</label></li>
+                <li><input type="checkbox" name="tuesday" id="tuesday" value="1" {%if pre[4]%}checked{%endif%}>
+                    <label for="tuesday">Tuesday</label></li>
+                <li><input type="checkbox" name="wednesday" id="wednesday" value="1" {%if pre[5]%}checked{%endif%}>
+                    <label for="wednesday">Wednesday</label></li>
+                <li><input type="checkbox" name="thursday" id="thursday" value="1" {%if pre[6]%}checked{%endif%}>
+                    <label for="thursday">Thursday</label></li>
+                <li><input type="checkbox" name="friday" id="friday" value="1" {%if pre[7]%}checked{%endif%}>
+                    <label for="friday">Friday</label></li>
+                <li><input type="checkbox" name="saturday" id="saturday" value="1" {%if pre[8]%}checked{%endif%}>
+                    <label for="saturday">Saturday</label></li>
+            </ul>
+        </label>
+        <p id="at_least_one" style="color:#f00;"></p>
+    </div>
+    <div class="cell medium-6 large-4">
+        <div class="grid container">
+            <div class="auto cell">
+                <label>Starting Time
+                    <div class="grid-x grid-margin-x">
+                        <div class="cell small-4" style="margin-right:24px;">
+                            <SELECT name="start_hour" id="start_hour"  required>
+                            {% for h in hour_list %}
+                                <OPTION value="{{h}}">{{h}}</OPTION>
+                            {% endfor %}
+                                <OPTION value="12" selected>12</OPTION>
+                            </SELECT>
+                        </div>
+                        <div class="cell small-4" style="margin-right:24px;margin-left:0;">
+                            <SELECT name="start_minute" id="start_minute"  required>
+                            {% for m in minute_list %}
+                                <OPTION value="{{m}}">{{m}}</OPTION>
+                            {% endfor %}
+                            </SELECT>
+                        </div>
+                        <div class="cell small-4" style="margin-right:0;margin-left:0;">
+                            <SELECT name="start_period" id="start_period" required>
+                                <OPTION value="AM" default>AM</OPTION>
+                                <OPTION value="PM">PM</OPTION>
+                            </SELECT>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="auto cell">
+                <label>Ending Time
+                    <div class="grid-x grid-margin-x">
+                        <div class="cell small-4" style="margin-right:24px;">
+                            <SELECT name="end_hour" id="end_hour" required>
+                            {% for h in hour_list %}
+                                <OPTION value="{{h}}">{{h}}</OPTION>
+                            {% endfor %}
+                                <OPTION value="12" selected>12</OPTION>
+                            </SELECT>
+                        </div>
+                        <div class="cell small-4" style="margin-right:24px;margin-left:0;">
+                            <SELECT name="end_minute" id="end_minute" required>
+                            {% for m in minute_list %}
+                                <OPTION value="{{m}}">{{m}}</OPTION>
+                            {% endfor %}
+                            </SELECT>
+                        </div>
+                        <div class="cell small-4" style="margin-right:0;margin-left:0;">
+                            <SELECT name="end_period" id="end_period" required>
+                                <OPTION value="AM" default>AM</OPTION>
+                                <OPTION value="PM">PM</OPTION>
+                            </SELECT>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <p id="time_comparison" style="color:#f00;"></p>
+
+            <div class="cell auto">
+                <label>Starting Date
+                    <input type="date" name="date_start" id="date_start" required>
+                </label>
+            </div>
+            <div class="auto cell">
+                <label>Ending Date
+                    <input type="date" name="date_end" id="date_end" onsubmit="compare_dates()" required>
+                </label>
+            </div>
+            <p id="date_comparison" style="color:#f00;">
+                {% if overlap %}There is a schedule conflict. Dates overlap with the following class(es): 
+                {% for e in overlap %}
+                    {{e}}.
+                {% endfor %}
+                {% endif %}
+            </p>
+            
+            <!--<p id="time_period" style="color:#f00;"></p> -->
+        </div>
+    </div>
+</div>
+
+<div class="grid-x grid-padding-x align-center-middle">
+    <div class="cell large-8">
+        <div class="top-bar" style="margin-bottom:8px;">
+            <div class="top-bar-left">
+                <ul class="menu">
+                    <div>
+                        <li style="width:auto; float:left; display:inline-block;"><input type="search"
+                            id="search_student" placeholder="Search"></li>
+                        <li style="float:right; display:inline-block;"><button type="button" class="button">
+                            <i class="fi-magnifying-glass"></i></button></li>
+                    </div>
+                </ul>
+                <p></p>
+            </div>
+            <div class="top-bar-right" >
+                <ul class="menu">
+                    <div>
+                        <li style="width:auto; float:left; display:inline-block;">
+                            <input type="text" name="student_name" id="student_name" placeholder="New Student"
+                           pattern="[a-zA-Z, ]*"
+                           oninput="this.value = this.value.replace(/[^a-zA-Z, ]/g, '').replace(/(\..*)\./g, '$1');"
+                           onfocus="this.placeholder='Last Name, First Name'"
+                           onblur="this.placeholder='New Student'"/></li>
+                        <li style="float:right;display:inline-block;">
+                            <button type="button" class="button" name="quickadd"
+                            onclick="checknewstudent();"><i class="fi-plus"></i></button></li>
+                    </div>
+                </ul>
+                <p id="name_message"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid-x grid-padding-x align-center-middle">
+    <div class="cell medium-5 large-3">
+		
+        <label>All Students:
+            <select name="available" id="available" multiple style="height:160px;">
+            <!-- Jinja sorts this list by second index of the tuple-->
+            {% for s in avail|sort(attribute='1') %} 
+                <option value ="{{s[0]}}-{{s[1]}}">{{s[1]}}</option>
+            {% endfor %}
+            </select>
+        </label>
+	</div>
+	<div class="cell medium-2 large-2" style="margin-top:26px; min-width:98px;">
+		<div class="grid-y">
+			<center>
+			<div class="cell small-4">
+			<button class="button" type="button" style="width:98px;color:black;" onclick="enroll();">Enroll  <i class="fi-arrow-right"></i></button></div>
+			<div class="cell small-4">
+			<button class="button" type="button" style="color:black;" onclick="remove();">Remove <i class="fi-arrow-left"></i></button></div>
+            </center>
+        </div>
+  		
+	</div>
+  	<div class="cell medium-5 large-3">
+        <label>Enrolled Students:
+            <select name="enrolledlist" id="enrolledlist" multiple style="height:160px;">
+            {% if inc %}
+                {% for i in inc|sort(attribute='1') %}
+                    <option value="{{i[0]}}-{{i[1]}}">{{i[1]}}</option>
+                {% endfor %}
+            {% endif %}
+            </select>
+        </label>
+	</div>
+</div>
+
+<div class="grid-x grid-padding-x align-center-middle">
+    <div class="cell large-8">
+        <div class="top-bar">
+            <div class="top-bar-right">
+                <ul class="menu">
+                    <li><button type="button" class="button" onclick="resetform();" style="margin-right:20px;"><i class="fi-page"></i> Clear</button></li>
+                    <li><button type="button" class="button" onclick="history.back()" style="margin-right:20px;"><i class="fi-x"></i> Cancel</button></li>
+                    <li><button type="submit" class="button" name="save" 
+                        onclick="return validate();"><i class="fi-save"></i> Save</button></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<input name="time_start" id="time_start" type="hidden">
+<input name="time_end" id="time_end" type="hidden">
+
+</form>
+
+<script type="text/javascript">
+    // This block reverts the date format from the DB back to HTML
+    arr_pre = {{pre|tojson}};
+    if (arr_pre != null) {
+        // DATE input tag from HTML reads YYYY-mm-dd but javascript DATE() format is mm-dd-YYYY
+        document.getElementById('date_start').value = arr_pre[9];
+        document.getElementById('date_end').value = arr_pre[10];
+
+        // TIME is split into 3 parts to match form entries
+        document.getElementById('start_hour').value = arr_pre[11].slice(0,2);
+        document.getElementById('start_minute').value = arr_pre[11].slice(3,5);
+        document.getElementById('start_period').value = arr_pre[11].slice(6,8);
+        document.getElementById('end_hour').value = arr_pre[12].slice(0,2);
+        document.getElementById('end_minute').value = arr_pre[12].slice(3,5);
+        document.getElementById('end_period').value = arr_pre[12].slice(6,8);
+    }
+
+    // This block performs a text search on the select option items of #available students
+    $('#search_student').keyup( function() {
+        var $rows = $('#available option');
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        
+        $rows.show().filter( function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+    });
+
+    // validate() calls 3 other functions
+    function validate() {
+        if (at_least_one() && compare_dates() && compare_times()) {
+            let enrolled = document.getElementById('enrolledlist');
+            for (var i = 0 ; i < enrolled.options.length ; i++)
+            {
+                enrolled.options[i].selected = true;
+            }
+            document.getElementById('time_start').value = build_start();
+            document.getElementById('time_end').value = build_end();
+            document.getElementById('editclassform').submit();
+        }
+        else {
+            return false;
+        }
+    }
+    function at_least_one() {
+        if (document.getElementById('monday').checked ||
+                    document.getElementById('tuesday').checked ||
+                    document.getElementById('wednesday').checked ||
+                    document.getElementById('thursday').checked ||
+                    document.getElementById('friday').checked ||
+                    document.getElementById('saturday').checked ||
+                    document.getElementById('sunday').checked) {
+            document.getElementById('at_least_one').textContent = "";
+            return true;
+        } else {
+            document.getElementById('at_least_one').textContent = "Select at least one day of the week";
+            return false;
+        }
+    }
+
+    function compare_dates() {
+        // DATE input tag from HTML reads YYYY-mm-dd but javascript DATE() format is mm-dd-YYYY
+        var parts = document.getElementById('date_start').value.match(/(\d+)/g);
+        var parts2 = document.getElementById('date_end').value.match(/(\d+)/g);
+        if (parts === null || parts2 === null) {
+            document.getElementById('date_comparison').textContent = "Missing dates";
+            return false;
+        }
+        else {
+            let date_start = new Date(parts[0], parts[1]-1, parts[2]);
+            let date_end = new Date(parts2[0], parts2[1]-1, parts2[2]);
+            if (date_end.getTime() < date_start.getTime()) {
+                document.getElementById('date_comparison').textContent = "End date must be later than Start date";
+                return false;
+            } else {
+                document.getElementById('date_comparison').textContent = "";
+                return true;
+            }   
+        }
+        
+    }
+    function compare_times() {
+        
+        let start_hour = calc_start();
+        let start_minute = parseInt(document.getElementById('start_minute').value, 10);
+        let end_hour = calc_end();
+        let end_minute = parseInt(document.getElementById('end_minute').value, 10);
+        
+        document.getElementById('time_comparison').textContent = start_period;
+        if (start_hour > end_hour) {
+            document.getElementById('time_comparison').textContent = "End time must be later than Start time.";
+            return false;
+        } else {
+            if ((start_minute > end_minute) && (start_hour === end_hour)){
+                document.getElementById('time_comparison').textContent = "End time must be later than Start time.";
+                return false;
+            } else {
+                if ((start_minute === end_minute) && (start_hour === end_hour)){
+                    document.getElementById('time_comparison').textContent = "End time must be later than Start time.";
+                    return false;
+                } else if ( (start_hour === 0) && (end_hour === 24) && (start_minute === end_minute)) {
+                    document.getElementById('time_comparison').textContent = "End time must be later than Start time.";
+                    return false;
+                } else {
+                    document.getElementById('time_comparison').textContent = "";
+                    return true;
+                }
+            }
+        }
+    }
+
+    function build_start() {
+        let start_hour = calc_start();
+        let start_minute = parseInt(document.getElementById('start_minute').value, 10);
+        return start_hour + ":" + start_minute + ":00";
+    }
+
+    function calc_start() {
+        let start_hour = parseInt(document.getElementById('start_hour').value, 10);
+        let start_period = document.getElementById('start_period').value;
+
+        if (start_period === 'PM') {
+            start_hour = start_hour + 12;
+            if (start_hour === 24) {
+                start_hour = 12;
+            }
+        }
+        else {
+            if (start_hour === 12) {
+                start_hour = 0;
+            }
+        }
+        return start_hour;
+    }
+
+    function build_end() {
+        let end_hour = calc_end();
+        let end_minute = parseInt(document.getElementById('end_minute').value, 10);
+        return end_hour + ":" + end_minute + ":00";
+    }
+
+    function calc_end() {
+        let end_hour = parseInt(document.getElementById('end_hour').value, 10);
+        let end_period = document.getElementById('end_period').value;
+        let end_minute = parseInt(document.getElementById('end_minute').value, 10);
+
+        if (end_period === 'PM') {
+            end_hour = end_hour + 12;
+            if (end_hour === 24) {
+                end_hour = 12;
+            }
+        }
+        else {
+            if (end_hour === 12) {
+                // assuming no one takes classes after 12am.
+                if (end_minute === 0) {
+                    end_hour = 24;
+                }
+                else {
+                    end_hour = 0;
+                }
+            }
+        }
+        return end_hour;
+    }
+
+    function enroll() {
+        // add functionality if option is already there
+        var available = document.getElementById('available');
+        var i;
+        for (i = available.length - 1 ; i >= 0 ; i--) 
+        {
+            if (available.options[i].selected) 
+            {
+                var new_element = document.createElement('option');
+                new_element.text = available.options[i].text;
+                new_element.value = available.options[i].value;
+                var enrolled = document.getElementById('enrolledlist');
+                try {
+                    enrolled.add(new_element, null);
+                }
+                catch(ex) {
+                    enrolled.add(new_element); // IE only
+                }
+                available.remove(i);
+            }
+        }
+        sortSelect(document.getElementById('enrolledlist'));
+    }
+
+    function remove() {
+        var enrolled = document.getElementById('enrolledlist');
+        var i;
+        for (i = enrolled.length - 1 ; i >= 0 ; i--) 
+        {
+            if (enrolled.options[i].selected) 
+            {
+                var new_element = document.createElement('option');
+                new_element.text = enrolled.options[i].text;
+                new_element.value = enrolled.options[i].value;
+                var available = document.getElementById('available');
+                try {
+                    available.add(new_element, null);
+                }
+                catch(ex) {
+                    available.add(new_element); // IE only
+                }
+                enrolled.remove(i);
+            }
+        }
+        sortSelect(document.getElementById('available'));
+    }
+    
+    function sortSelect(selElem) {
+        var tmpAry = new Array();
+        // Copies the selElem array elements into a new array tmpAry
+        for ( var i = 0; i < selElem.options.length; i++) {
+            tmpAry[i] = new Array();
+            tmpAry[i][0] = selElem.options[i].text;
+            tmpAry[i][1] = selElem.options[i].value;
+        }
+        // Sorts the temporary Array
+        tmpAry.sort();
+        // Clears the original selElem array
+        while (selElem.options.length > 0) {
+            selElem.options[0] = null;
+        }
+        // Copies the sorted array onto the selElem array
+        for (var i=0;i<tmpAry.length;i++) {
+            var op = new Option(tmpAry[i][0], tmpAry[i][1]);
+            selElem.options[i] = op;
+        }
+    }
+
+    function resetform() {
+        
+        document.getElementById('editclassform').reset();
+        // This clears all checkboxes, I don't understand why reset doesn't do this automatically
+        document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+        // Clears Class name textfield
+        document.getElementById('class_name').value = "";
+        // Clears all enrolled students
+        var enrolled = document.getElementById('enrolledlist');
+        for (var i = enrolled.length - 1 ; i >= 0 ; i--) {
+            var new_element = document.createElement('option');
+            new_element.text = enrolled.options[i].text;
+            new_element.value = enrolled.options[i].value;
+            var available = document.getElementById('available');
+            
+            try {
+                available.add(new_element, null);
+            }
+            catch(ex) {
+                available.add(new_element); // IE only
+            }
+            enrolled.options[i].remove();
+        }
+    }
+
+    
+    function checknewstudent() {
+        
+        // ------------------------------------------------------
+        // First, let's check the new student name format 
+        let raw_input = document.getElementById('student_name').value;
+        var input = raw_input.replace(/\s+/g,' ').trim();
+        //document.getElementById('name_message').innerHTML = input;
+        
+        if ( input.match(/,/g) != null ) {
+            document.getElementById('name_message').innerHTML = "step 1";
+            if ( input.match(/,/g).length == 1 ) {
+                document.getElementById('name_message').innerHTML = "step 2";
+                
+                const names = input.split(","); // split the input
+                
+                const names1 = names[0].split(" ");
+                const before_comma = [];
+                for ( x = 0; x < names1.length; x++ ) {
+                    if ( names1[x] != "" && names1[x] != undefined )
+                    {before_comma.push(names1[x]);}
+                }
+                
+                const names2 = names[1].split(" ");
+                const after_comma = [];
+                for ( y = 0; y < names2.length; y++ ) {
+                    if ( names2[y] != "" && names2[y] != undefined )
+                    {after_comma.push(names2[y]);}
+                }
+                document.getElementById('name_message').innerHTML = "step 3";
+                
+                if ( before_comma.length == 1 && after_comma.length == 1 ) {
+                    // do nothing, continue!
+                    document.getElementById('name_message').innerHTML = "step 4";
+                }
+                else {
+                    document.getElementById('name_message').innerHTML = "Use format: Last Name,(comma) First Name! Only one last name is allowed!";
+                    return;
+                }
+                
+            }
+            else {
+                document.getElementById('name_message').innerHTML = "Use only one comma!";
+                return;
+            }
+        }
+        else {
+            document.getElementById('name_message').innerHTML = "Missing comma!";
+            return;
+        }
+
+        
+        // ------------------------------------------------------
+        let enrolled = document.getElementById('enrolledlist');
+        for (var i = 0 ; i < enrolled.options.length ; i++)
+        {
+            enrolled.options[i].selected = true;
+        }
+        document.getElementById('time_start').value = build_start();
+        document.getElementById('time_end').value = build_end();
+        document.forms['editclassform'].submit();
+    }
+
+</script>
+
+{% endblock content %}

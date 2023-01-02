@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width = device-width, initial-scale = 1,maximum-scale = 2.00,">
+    <!-- width varies by device and scale 1:1 does not zoom out of the box -->
+    <title>Be Present</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css">
+    <link rel="stylesheet" href="../static/styles/foundation.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!--
+    <script type="text/javascript" src="assets/js/foundation.core.js"></script>
+    <script type="text/javascript" src="assets/js/foundation.sticky.js"></script>
+    <script type="text/javascript" src="assets/js/foundation.util.mediaQuery.js"></script>
+    <script type="text/javascript" src="assets/js/foundation.util.triggers.js"></script>
+    -->
+</head>
+<!--<body style = "background:#000;"> -->
+<body>
+    <div  class="menu align-center" style="background: #1779ba;position:sticky;top:0;z-index:2;" >
+        <ul class="menu expanded text-center icon-top" >
+            <li class="menu-text align-center-middle" style="font-size:28px;background-color:#1779ba;padding:10px 0 0 0;">Be Present</li>
+            <div class="grid-x align-center-middle" style="width:100%;padding:0;margin:0;">
+            <li class="cell auto"><a href="calendar" style="padding-right:0;padding-left:0;" class="button">
+                <i class="fi-calendar" style="font-size:1.5em;"></i><span style="padding-right:0;padding-left:0;">Calendar</span></a></li>
+            <li class="cell auto"><a href="students" style="padding-right:0;padding-left:0;" class="button">
+                <i class="fi-torsos" style="font-size:1.5em;"></i><span style="padding-right:0;padding-left:0;">Students</span></a></li>
+            <li class="cell auto"><a href="classes" style="padding-right:0;padding-left:0;" class="button">
+                <i class="fi-book" style="font-size:1.5em;"></i><span style="font-size:1em;">Classes</span></a></li>
+            <li class="cell auto"><a href="about" style="padding-right:0;padding-left:0;" class="button">
+                <i class="fi-info" style="font-size:1.5em;"></i><span  style="font-size:1em;">About</span></a></li>
+            <li class="cell auto"><a href="logout" style="padding-right:0;padding-left:0;" class="button">
+                <i class="fi-arrow-right" style="font-size:1.5em;"></i><span  style="font-size:1em;">Logout</span></a></li>
+            </div>
+        </ul>
+    </div>
+    
+    <div class="grid-container fluid" style="width:98%; margin-top:16px;">
+        <div class="grid-x align-center">
+            <div class="cell">
+                
+                {% block content %}
+                {% endblock content %}
+                
+            </div>
+        </div>
+    </div>
+    
+    
+</body>
+</html>

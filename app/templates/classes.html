@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Top Menu bar -->
+<div class="grid-x grid-padding-x align-center-middle">
+    <div class="cell large-8">
+		<div class="top-bar">
+			<div class="top-bar-left">
+				<ul class="menu">
+					<li class="menu-text">Classes</li>
+					<li style="margin-right:2px;"><a href="editclass" class="button" name="newclass"><i class="fi-plus"></i><span> New Class</span></a></li>
+					<li style="margin-right:2px;"><a href="" class="button" id="order" onclick="order()"><i class="fi-list"></i><span> Order</span></a></li>
+				</ul>
+			</div>
+			<div class="top-bar-right" style="margin-top:2px;">
+				<ul class="menu">
+					<li><input type="search" id="search_class" placeholder="Search"></li>
+					<li><button type="button" class="button"><i class="fi-magnifying-glass"></i></button></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Top Legend bar -->
+<div class="grid-x grid-padding-x align-center-middle text-center" style="margin-top:40px;">
+    <div class="cell large-8">
+        <div class="grid-x grid-padding-x align-center-middle text-center">
+            <div class="cell large-auto medium-3 small-3" style="background:#5aacfe;margin-left:4px;margin-right:4px;">Name</div>
+            <div class="cell large-auto medium-2 small-3" style="background:#5aacfe;margin-left:4px;margin-right:4px;">Weekdays</div>
+            <div class="cell large-auto medium-3 small-2" style="background:#5aacfe;margin-left:4px;margin-right:4px;">Time</div>
+			<div class="cell large-auto medium-3 small-3" style="background:#5aacfe;margin-left:4px;margin-right:4px;">Period</div>
+		</div>
+    </div>
+</div>
+
+<!-- List of all div classes -->
+<div class="grid-x grid-padding-x align-center-middle text-center" >
+    <div class="cell large-8" >
+	<div class="grid-x grid-padding-x align-center-middle" id="all_classes" style="margin-top:8px;">
+    <div class="cell">
+	{% set flag = namespace(status=1) %}
+	{% set flag2 = namespace(status=1) %}
+
+	<p style="text-align:left;">Open</p>
+	{% for d in data %}
+		<form method="POST"> <!-- each button is a different form! -->
+		<input name="classid" type="hidden" value="{{d[0]}}">
+		
+		{% if d[13] == 0 %}
+		<div class="button primary expanded" style="color:#000000;background:#ffffff;border:1px solid #1779ba;"
+			onclick="this.parentNode.submit();">
+		{% endif %}
+
+		{% if d[13] == 1 %}
+		{% if flag.status %}<p style="text-align:left;">Upcoming</p>{% set flag.status = 0 %}{% endif %}
+		<div class="button primary expanded" onclick="this.parentNode.submit();">
+		{% endif %}
+		
+		{% if d[13] == 2 %}
+			{% if flag2.status %}
+				<p style="text-align:left;">Past
+				<button class="button" type="button" onclick="toggle_past();" style="color:#0c3d5d;
+                        background:white;font-size:2em; margin:0; padding:0;">
+					<i id="toggle" class="fi-arrow-down"></i></button>
+				</p>
+				{% set flag2.status = 0 %}
+			{% endif %}
+		<div class="button primary expanded" style="color:#000;background:#e6e6e6;border:1px solid #000;display:none;"
+			onclick="this.parentNode.submit()" id="{{d[1]}}" >
+		{% endif %}
+
+			<div class="grid-x grid-padding-x align-center-middle text-center" style="margin:0;padding:0;">
+				<div class="cell medium-3 small-4" style="min-width:64px;overflow-wrap:anywhere;word-break:break-word;">{{d[1]}}</div><!-- Name -->
+				<div class="cell medium-3 small-2"><!-- Days of the week -->
+					
+					{% if d[2] %}
+					<span style="font-weight:bold;" class="text">Su&nbsp</span>
+					
+					{% endif %}
+					{% if d[3] %}
+					<span style="font-weight:bold;margin:0;padding:0;">Mo&nbsp</span>
+					
+					{% endif %}
+					{% if d[4] %}
+					<span style="font-weight:bold;margin:0;padding:0;">Tu&nbsp</span>
+					
+					{% endif %}
+					{% if d[5] %}
+					<span style="font-weight:bold;margin:0;padding:0;">We&nbsp</span>
+					
+					{% endif %}
+					{% if d[6] %}
+					<span style="font-weight:bold;margin:0;padding:0;">Th&nbsp</span>
+					
+					{% endif %}
+					{% if d[7] %}
+					<span style="font-weight:bold;margin:0;padding:0;">Fr&nbsp</span>
+					
+					{% endif %}
+					{% if d[8] %}
+					<span style="font-weight:bold;margin:0;padding:0;">Sa</span>
+					{% endif %}
+				</div>
+				<div class="cell medium-3 small-3" style="min-width:64px;">{{d[11]}}<br>{{d[12]}}</div><!-- Time -->
+				<div class="cell medium-3 small-3" style="min-width:64px;">{{d[9]}}<br>{{d[10]}}</div><!-- Dates -->
+			</div>
+		</div>
+		</form>
+	{% endfor %}
+	</div>
+	</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+allclasses = {{data|tojson}};
+function toggle_past() {
+	for ( let x = 0 ; x < allclasses.length ; x++ ) {
+		let past = allclasses[x];
+		if (past[13] === 2) {
+			let el = document.getElementById( past[1] );
+			if (el.style.display === "none") {
+				el.style.display = "block";
+				document.getElementById("toggle").className = "fi-arrow-up";
+			} else {
+				el.style.display = "none";
+				document.getElementById("toggle").className = "fi-arrow-down";
+			}
+		}
+	}
+}
+
+// This block performs a text search on the div items of #available classes
+    $('#search_class').keyup( function() {
+        document.getElementById("toggle").className = "fi-arrow-up";
+        let $rows = $('#all_classes div');
+        let val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        
+        $rows.show().filter( function() {
+            let text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+    });
+
+</script>
+
+{% endblock content %}

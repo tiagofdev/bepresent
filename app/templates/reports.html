@@ -1,0 +1,219 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="static/styles/tables.css" />
+
+<div class="grid-x grid-padding-x text-center align-center">
+	<div class="cell large-2"></div>
+	<div class="cell auto" style="background:#e6e6e6;margin-left:4px;margin-right:4px;">Class</div>
+	<div class="cell auto" style="background:#e6e6e6;margin-left:4px;margin-right:4px;">Time</div>
+	<div class="cell auto" style="background:#e6e6e6;margin-left:4px;margin-right:4px;">Dates</div>
+	<div class="cell large-2"></div>
+</div>
+<div class="grid-x grid-padding-x text-center align-center" style="margin-bottom:20px;">
+	<div class="cell large-2"></div>	
+	<div class="cell auto">
+		{{data_s[1]}}<br>
+		{% if data_s[2] %}
+				<span style="font-weight:bold; margin:0;padding:0;">Su&nbsp</span>
+				
+				{% endif %}
+				{% if data_s[3] %}
+				<span style="font-weight:bold;margin:0;padding:0;">Mo&nbsp</span>
+				
+				{% endif %}
+				{% if data_s[4] %}
+				<span style="font-weight:bold;margin:0;padding:0;">Tu&nbsp</span>
+				
+				{% endif %}
+				{% if data_s[5] %}
+				<span style="font-weight:bold;margin:0;padding:0;">We&nbsp</span>
+				
+				{% endif %}
+				{% if data_s[6] %}
+				<span style="font-weight:bold;margin:0;padding:0;">Th&nbsp</span>
+				
+				{% endif %}
+				{% if data_s[7] %}
+				<span style="font-weight:bold;margin:0;padding:0;">Fr&nbsp</span>
+				
+				{% endif %}
+				{% if data_s[8] %}
+				<span style="font-weight:bold;margin:0;padding:0;">Sa</span>
+				{% endif %}
+	</div>
+	<div class="cell auto" >{{data_s[11]}}<br>{{data_s[12]}}</div>
+	<div class="cell auto" >{{data_s[9]}}<br>{{data_s[10]}}</div>
+	<div class="cell large-2"></div>
+</div>
+
+<!-- Menu bar options -->
+<div class="grid-x grid-padding-x align-center-middle" style="margin-top:20px;">
+    <div class="cell large-8">
+		<div class="top-bar">
+  			<div class="top-bar-left">
+                <form>
+                <div class="radios">	
+                    <input type="radio" id="summary_button" name="view" checked onchange="toggle();">
+                    <label style="width:100px;height:41px;vertical-align:middle;text-align:center;padding-top:8px;border:0;" 
+                        for="summary_button"><i class="fi-list"></i> Summary</label>
+                    <input type="radio" id="details_button" name="view" onchange="toggle();">
+                    <label style="width:100px;height:41px;vertical-align:middle;text-align:center;padding-top:8px;border:0;" 
+                        for="details_button"><i class="fi-thumbnails"></i> Details</label>
+                    <button class="button" type="button" onclick="tableToCSV()" 
+                        style="margin-top:17px;margin-left:8px;border:1px solid black;color:black;border:0;">
+                        <i class="fi-download"></i> Download CSV</button>
+                    
+                </div>
+                </form>
+                
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="grid-x grid-padding-x text-center align-center">
+    <div class="cell large-8 " id="summary_report">
+    <table>
+        <caption>Attendance: {{taken}} taken out of {{days}} Days</caption>
+        <tr>
+            <th style="width:30%;">Student</th>
+            <th data-tooltip tabindex="1" title="Absent" data-position="bottom" data-alignment="left"><i class="fi-x"></i></th>
+            <th data-tooltip tabindex="1" title="Present" data-position="bottom" data-alignment="left"><i class="fi-check"></i></th>
+            <th data-tooltip tabindex="1" title="Late" data-position="bottom" data-alignment="left"><i class="fi-clock"></i></th>
+            <th data-tooltip tabindex="1" title="Excused" data-position="bottom" data-alignment="left"><i class="fi-page-filled"></i></th>
+            <th data-tooltip tabindex="1" title="Attendance Rate" data-position="bottom" data-alignment="left">%</th>
+        </tr>
+        {% if stats %}
+        {% for ss in stats %}
+        <tr>
+            <td>{{ss[0]}}</td>
+            <td>{{ss[1]}}</td>
+            <td>{{ss[2]}}</td>
+            <td>{{ss[3]}}</td>
+            <td>{{ss[4]}}</td>
+            <td>{{ss[5]}}%</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </table>
+    </div>
+    
+    <div class="cell large-8 " id="details_report" style="display:none;overflow:auto;margin-top:20px;">
+        
+        <table>
+            <tr>
+                <th class="headcol">Student</th>
+                {% for cd in class_dates %}
+                    <td class="cols">{{cd[0][5:] | replace("-","/") }}</td>
+                {% endfor %}
+            </tr>
+            {% if stats %}
+            {% for n in range(stats|length) %}
+            <tr>
+                <td class="headcol">{{stats[n][0]}}</td>
+                {% set counter = namespace(value = 0) %}
+                {% for cd in class_dates %}
+                    {% if cd[1] == 1 %}
+                        {% if details[n][counter.value] == 'Present' %}
+                            <td class="cols"><i class="fi-check"></i></td>
+                        {% elif details[n][counter.value] == 'Partial' %}
+                            <td class="cols"><i class="fi-clock"></i></td>
+                        {% elif details[n][counter.value] == 'Absent' %}
+                            <td class="cols"><i class="fi-x"></i></td>
+                        {% else %}
+                            <td class="cols"><i class="fi-page-filled"></i></td>
+                        {% endif %}
+                        {% set counter.value = counter.value + 1 %}
+                    {% else %}
+                        <td class="cols">-</td>
+                    {% endif %}
+                {% endfor %}
+                <!-- Each date status for this student -->
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+function toggle() {
+    
+    if (document.getElementById('summary_button').checked) {
+        document.getElementById('summary_report').style.display = "block";
+        document.getElementById('details_report').style.display = "none";
+    } else {
+        document.getElementById('summary_report').style.display = "none";
+        document.getElementById('details_report').style.display = "block";
+    }
+
+}
+
+function tableToCSV() {
+ 
+    // Variable to store the final csv data
+    var csv_data = [];
+ 
+    // Get each row data
+    var rows = document.getElementsByTagName('tr');
+    for (var i = 0; i < rows.length; i++) {
+ 
+        // Get each column data
+        var cols = rows[i].querySelectorAll('td,th');
+ 
+        // Stores each csv row data
+        var csvrow = [];
+        for (var j = 0; j < cols.length; j++) {
+             // Get the text data of each cell of
+            // a row and push it to csvrow
+            if (cols[j].innerHTML == '<i class="fi-check"></i>') {csvrow.push("Present");}
+            else if (cols[j].innerHTML == '<i class="fi-clock"></i>') {csvrow.push("Late");}
+            else if (cols[j].innerHTML == '<i class="fi-x"></i>') {csvrow.push("Absent");}
+            else if (cols[j].innerHTML == '<i class="fi-page-filled"></i>') {csvrow.push("Excused");}
+            else {csvrow.push(cols[j].innerHTML);}
+       }
+ 
+        // Combine each column value with comma
+        csv_data.push(csvrow.join(","));
+    }
+    // combine each row data with new line character
+    csv_data = csv_data.join('\n');
+ 
+    /* We will use this function to download
+    the data in a csv file downloadCSVFile(csv_data);
+    */
+    downloadCSVFile(csv_data);
+}
+
+function downloadCSVFile(csv_data) {
+ 
+    // Create CSV file object and feed our
+    // csv_data into it
+    CSVFile = new Blob([csv_data], { type: "text/csv" });
+ 
+    // Create to temporary link to initiate
+    // download process
+    var temp_link = document.createElement('a');
+ 
+    // Download csv file
+    var class_data = {{data_s|tojson}};
+    var class_name = class_data[1];
+    temp_link.download = class_name + "_Report.csv";
+    var url = window.URL.createObjectURL(CSVFile);
+    temp_link.href = url;
+ 
+    // This link should not be displayed
+    temp_link.style.display = "none";
+    document.body.appendChild(temp_link);
+ 
+    // Automatically click the link to trigger download
+    temp_link.click();
+    document.body.removeChild(temp_link);
+}
+
+</script>
+
+{% endblock content %}
+

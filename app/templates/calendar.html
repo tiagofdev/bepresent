@@ -1,0 +1,244 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+
+<div class="grid-x grid-margin-x align-center" style="border-bottom:1px solid #1779ba;">
+    <div class="cell grid-margin-x large-6 medium-9">
+        <div class="grid-x grid-margin-x align-center">
+            <div class="cell margin-padding-x medium-1 small-1">
+                <form method="POST">
+                    <input name="month" type="hidden" value="{{month}}">
+                    <input name="year" type="hidden" value="{{year}}">
+                    <button class="button" type="submit" name="button_previous" style="color:#0c3d5d;background:white;
+                        font-size:2em; margin:0; padding:0;" onclick="fill();">
+                        <i class="fi-arrow-left"></i></button>
+                </form>
+            </div>
+            <div class="cell margin-padding-x medium-10 small-10">
+                <div id="month" style="font-weight:bold; text-align: center;"></div>
+                <br>
+            </div>
+            <div class="cell margin-padding-x medium-1 small-1">
+                <form method="POST">
+                    <input name="month" type="hidden" value="{{month}}">
+                    <input name="year" type="hidden" value="{{year}}">
+                    <button class="button" type="submit" name="button_next" style="color:#0c3d5d;background:white;
+                        font-size:2em; margin:0; padding:0; float:right;" onclick="fill();">
+                        <i class="fi-arrow-right"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="cell grid-margin-x large-2 medium-3">
+        <div id="day" style="font-weight:bold;background:#fff;padding-top:8px; text-align: center;"></div>
+        <br>
+    </div>
+</div>
+<div class="grid-x grid-margin-x align-center" style="margin-top:16px;" >
+    <div class="cell grid-margin-x large-6 medium-9" style="margin-top:8px;">
+        <div class="grid-x text-center">
+            {% for wk in weekdays %}
+            <div class="cell auto" style="font-weight:bold;">{{wk}}</div>
+            {% endfor%}
+        </div>
+        {% set last = namespace(slot=0) %}
+        {% for r in range(6) %}
+            <div class="grid-x">
+                {% for c in range(7) %}
+                    {% if r == 0 and c <= first_weekday  %}
+                        <div class="cell auto hollow button secondary" id="{{r+1}}-{{c+1}}" style="margin:2px;
+                            background:#e6e6e6;border:1px solid #e6e6e6;">
+                        </div>
+                    {% elif r == 0 and c > first_weekday  %}
+                        <div class="cell auto hollow button secondary" id="{{ c - first_weekday }}" style="margin:2px;
+                            border:1px solid #1779ba;color:black;"
+                            onclick="get_day_selected({{ c - first_weekday }});">
+                            <p id="p{{ c - first_weekday }}">{{ c - first_weekday }}</p>
+                        </div>
+                    {% else %}
+                        {% if c + r * 7 - first_weekday <= days_in_month %}
+                            <div class="cell auto hollow button secondary" id="{{ c + (r * 7) - first_weekday }}" 
+                                style="margin:2px;border:1px solid #1779ba;color:black;"
+                                onclick="get_day_selected({{ c + (r * 7) - first_weekday }});">
+                                <p id="p{{c + (r * 7) - first_weekday}}">{{ c + (r * 7) - first_weekday }}</p>
+                            </div>
+                            {% set last.slot = c + r * 7 %}                            
+                        {% elif c + r * 7 > last.slot %}
+                            {% if last.slot < 35 and c + r * 7 < 35 %}
+                                    <div class="cell auto hollow button secondary" style="margin:2px;
+                                        background:#e6e6e6;border:1px solid #e6e6e6;">
+                                    </div>
+                            {% elif last.slot >= 35 %}
+                                <div class="cell auto hollow button secondary" style="margin:2px;
+                                    background:#e6e6e6;border:1px solid #e6e6e6;">
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+        
+    </div>
+    
+    <div class="cell grid-margin-x large-2 medium-3" id="day_selected" style="background:#e6e6e6;
+        white-space:pre-line;padding:6px;min-width:120px;">
+        <div class="grid-x grid-margin-x" style="margin:0;padding:0;
+            padding-bottom:100px;display:grid;">
+        {% if month_data %}
+
+        {% for md in month_data %}
+            <div class="cell auto" id="{{md[0]}}-{{md[3]}}" style="margin-bottom:0;
+                display:none;padding:0;min-height:90px;max-height:134px;margin-top:4px;">
+                <form method="POST">
+                    <input name="date" type="hidden" value="{{md[3]}}">
+                    <input name="class_id" type="hidden" value="{{md[0]}}">
+                    <button class="button hollow" name="button_class" type="submit" style="margin:0;
+                        background:#5aacfe;color:#000;width:100%;min-height:88px;max-height:100px;margin-top:-148px;"
+                        >{{md[1]}} <br>{{md[2]}}</button>
+                    <button class="button" name="button_attendance" type="submit" style="margin:0;
+                        width:100%;height:50px;margin-top:-88px;color:black;"
+                        ><i class="fi-checkbox"></i> Attendance
+                        </button>
+
+                    <!--
+                        <button class="button" name="button_attendance" type="submit" style="margin:0px;
+                        width:100%;height:40px;margin-top:-174px;color:black;"><i class="fi-checkbox"></i> Attendance
+                        </button>
+                    <button class="button hollow" name="button_class" type="submit" style="margin:0px;
+                        background:#5aacfe;color:#000;width:100%;height:68px;margin-top:-106px;margin-bottom:10px;"
+                        >{{md[1]}} <br>{{md[2]}}</button>
+                    -->
+                </form>
+            </div>
+        {% endfor %}
+
+        {% endif %}
+        </div>
+    </div>
+    
+</div>
+
+<!--
+<p id="test" style="background:#c63;">TEST: </p>
+<p id="test1"></p>
+<p id="test2"></p>
+<p>first_weekday:{{first_weekday}}</p>
+<p>days_in_month:{{days_in_month}}</p>
+<p>month from server:{{month}}</p>
+<p>year from server:{{year}}</p>
+<p>samples:{{month_data[0]}}
+<p>s2:{{month_data[1]}}
+-->
+
+<script type="text/javascript">
+
+const month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", 
+    "October", "November", "December"];
+var day_selected = "0";
+var month_selected = 0;
+var month_data = null;
+var today = new Date();
+
+window.onload = setup();
+window.onload = fill();
+
+function setup() {
+    
+    today = new Date({{js_date}})
+    today.setHours(0,0,0,0);
+    month_data = {{month_data|tojson}} 
+    month_selected = {{month}};
+    document.getElementById('month').innerHTML = month_names[{{month}}-1] + " " + {{year}};
+    
+    if ( today.getMonth() === {{month}} - 1) {
+        
+        document.getElementById('day').innerHTML = today.getDate();
+        document.getElementById(today.getDate()).style.backgroundColor = "#5aacfe";
+        document.getElementById(today.getDate()).style.color = "black";
+        
+        
+        get_day_selected(today.getDate());
+        //document.getElementById('test').style.backgroundColor = "green";
+    }
+    else {
+        document.getElementById('day').innerHTML = "1";
+        get_day_selected(1);
+    }
+    
+}
+
+function fill() {
+    
+    for ( let x = 0; x < month_data.length; x++ ) {
+        let id_i = parseInt(month_data[x][3].slice(8,10));
+        let id_s = "p" + id_i.toString();
+        //document.getElementById('test').innerHTML = id_s;
+        let newp = document.createElement("p");
+        let textnode = document.createTextNode("\n");
+        newp.appendChild(textnode);
+        
+        document.getElementById(id_s).appendChild(newp);
+        
+    }
+
+    for ( let z = 0; z < month_data.length; z++ ) {
+        let id_s = "p";
+        let id_i = parseInt(month_data[z][3].slice(8,10));
+        id_s += id_i.toString();
+        let icon = document.createElement("i");
+        icon.classList.add('fi-star');
+        document.getElementById(id_s).appendChild(icon);
+    }
+}
+
+function get_day_selected(day) {
+    
+    let previous_selected = day_selected;
+    day_selected = day;
+    document.getElementById('day').innerHTML = day;
+    
+    // month_data contains all classes for that month. However, they're all hidden unless JS decides to
+    // show them
+
+    // Iterate through month_data
+    for ( var x = 0; x < month_data.length; x++ ) {
+        // The ids of the hidden button-links to take attendance are id-date
+        let id = month_data[x][0].toString() + "-" + month_data[x][3].toString();
+        
+        // One day will always be selected in the calendar
+        // Only perform this if user clicks on a different button. Clicking on the same button will do nothing
+        if (previous_selected != day) {
+            // if the id is the same as the day selected
+            // The element will show up
+            if (parseInt(month_data[x][3].slice(8,10)) == day) {
+                document.getElementById(id).style.display = "block";
+            }
+            // The previous element will hide
+            if (parseInt(month_data[x][3].slice(8,10)) == previous_selected) {
+                document.getElementById(id).style.display = "none";
+            }
+        }
+    //document.getElementById('test').innerHTML = month_data[x][3].slice(8,10);
+    }
+    
+    // Change the color of the selected day button
+    document.getElementById(day).style.backgroundColor = "#5aacfe";
+    
+    if ( previous_selected != day ) {
+        // In case the previous button is the current date(today), it will go back to the highlited
+        // differentiated color, instead of the normal white
+        if ( previous_selected === today.getDate() && today.getMonth() + 1 == month_selected ) {
+            document.getElementById(previous_selected).style.backgroundColor = "#1779ba";
+        }
+        else if (previous_selected != 0 || previous_selected == day) {
+            document.getElementById(previous_selected).style.backgroundColor = "#fff";
+        }
+    }
+}
+
+
+</script>
+
+{% endblock content %}

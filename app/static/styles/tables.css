@@ -1,0 +1,24 @@
+﻿table,td,th {
+  border-collapse: separate;
+  margin: 0;
+  border: 1px solid black;
+  white-space: nowrap;
+  margin-left: -15px;
+  margin-right: 15px;
+}
+
+.headcol {
+  position: sticky;
+  width: 160px;
+  z-index: 2;
+  left: -15px;
+  background-color: white;
+  
+}
+
+.cols {
+  margin: 0;
+  width: 64px;
+  z-index: 1;
+  
+}

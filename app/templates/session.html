@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>Attendance</title>
+</head>
+<body>
+    <center>
+        <h1>Session</h1>
+        <form action="" method="POST">
+            <input name="go" type="submit" value="GO" />
+        </form>
+        <br />
+
+        {% for m in students %}
+        <p>{{m}}</p>
+        {% endfor %}
+    </center>
+    {% if error %}
+    <p class="error">
+        <strong>Error:</strong> {{ error }}
+    {% endif %}
+    
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+</body>
+</html>

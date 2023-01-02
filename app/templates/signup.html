@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <link rel="stylesheet" href="static/styles/foundation.css" />
+    <!-- width varies by device and scale 1:1 does not zoom out of the box -->
+    <title>Be Present - Sign Up</title>
+</head>
+<body style="background: linear-gradient(0deg, #fff, #69c 100%);
+    background-repeat: no-repeat;
+    background-size: auto 480px;">
+    <center>
+    <div class="grid-x align-center text-center" style="margin-top:4px;">
+        <center>
+        <div class="cell align-center">
+            <div class="cell" style="min-width:140px; max-width:320px;">
+                <h2>Be Present</h2>
+                <h6>The Attendance App</h6>
+            </div>
+            <form name="signup_form" method="POST">
+            <div class="callout primary" style="min-width:140px; max-width:320px;">
+                <label>Username</label>
+                <input name="form_username" type="text" maxlength="30" pattern="[A-Za-z0-9]+" required
+                    title="Only letters and number allowed!"
+                    oninput="this.value = this.value.replace(/[^0-9a-zA-Z]/g, '').replace(/(\..*)\./g, '$1');"/>
+                <label>Password</label>
+                <input name="form_password" id="form_password" type="password" minlength="4" pattern="[A-Za-z0-9!@#$%^*()]+" required
+                    title="Spaces not allowed! Minimum of 4 characters!"
+                       oninput="this.value = this.value.replace(/\s/g, '');"/>
+                <p style="text-align:left;">
+                    <input type="checkbox" id="visibility" onclick="toggle_visibility();">
+                    <label for="visibility">Show Password</label>
+                </p>
+                <label>Email</label>
+                <input name="form_email" type="email" maxlength="30" pattern="[A-Za-z0-9@._-]+" required
+                    title="Only letters, numbers, dots, hyphens and underscores allowed!" />
+                <input name="save" type="submit" value="Save" class="button" />
+            </div>
+            </form>
+        </div>
+        </center>
+    </div>
+    </center>
+    <br>
+    <div class="grid-x align-center text-center" style="margin-top:4px;">
+        <center>
+            {% if error %}
+                <p>{{ error }}</p>
+            {% endif %}
+            {% if message %}
+                <p>{{ message }}</p>
+                <a href="login">Go back to login</a>
+            {% endif %}
+        </center>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    function toggle_visibility() {
+        let elem = this.document.getElementById('form_password');
+        if ( elem.type === "password" ) {
+            elem.type = "text";
+        } else {
+            elem.type = "password";
+        }
+    }
+</script>

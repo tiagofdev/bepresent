@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="grid-x grid-padding-x align-center-middle" style="margin-bottom:20px;">
+    <div class="cell large-8">
+        <img src={{url_for('static', filename='images/logo9.svg')}} style="width:10%;"/>
+        <br><br>
+        <h2>About this website</h2>
+        <h4>Functionalities</h4>
+        <ul style="list-style-type:none;">
+            <li>Create Students and Classes records</li>
+            <li>Take attendance for each class day and generate reports</li>
+            <li>Attendance Reports available for download in CSV format</li>
+            <li>Browse your classes through the calendar interface</li>
+            <li>Sort students by first and last name</li>
+            <li>Class creation algorithm does not permit overlapping classes at the same time and day</li>
+            <li>Does not permit creating multiple classes with same name</li>
+            <li>Quick Add Students when creating classes</li>
+
+
+        </ul>
+        <h4>Techonologies used</h4>
+        <ul style="list-style-type:none;">
+            <li>Python</li>
+            <li>Flask / Jinja</li>
+            <li>MySQL</li>
+            <li>HTML / CSS / JS</li>
+            <li>Foundation</li>
+            <li>Google Cloud Platform</li>
+        </ul>
+        <h4>Security Features</h4>
+        <ul style="list-style-type:none;">
+            <li>Authentication System</li>
+            <li>Password Security using Hashing with Salt</li>
+            <li>Multiple failed login attempts prevented</li>
+            <li>Timed Session Control</li>
+            <li>Automatic logout after inactivity</li>
+            <li>Only one login per browser</li>
+            <li></li>
+        </ul>
+    </div>
+</div>
+
+
+
+{% endblock content %}

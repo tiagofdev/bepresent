@@ -1,0 +1,284 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="grid-x grid-padding-x align-center-middle">
+    <div class="cell large-8">
+        <div class="top-bar">
+        <div class="top-bar-left">
+            <ul class="menu">
+            <li class="menu-text" style="padding-left:0;padding-right:8px;">Students</li>
+            <li style="margin-right:4px;">
+                <a href="editstudent" class="button" style="padding-left:8px;padding-right:8px;">
+                    <i class="fi-plus"></i> New Student</a>
+            </li>
+            <li>
+                <form>
+                <div class="toggle_button">
+                    <input type="checkbox" id="toggle" />
+                    <label for="toggle">
+                        <div class="grid-x grid-padding-x align-center-middle text-center" onclick="toggle();">
+                            <div class="cell auto" style="padding-left:8px;padding-right:8px;">
+                                <i class="fi-trash"></i> Delete</div>
+                        </div>
+                    </label>
+                </div>
+                </form>
+            </li>
+            <li style="display:none;padding-left:8px;padding-right:8px;"><button class="button" type="button" 
+                onclick="rerender();"><i id="sort" class="fi-arrow-down" ></i> Sort</button>
+            </li>
+            <li><button class="button" type="button" style="padding-left:8px;padding-right:8px;" 
+                    onclick="dropdown();"><i id="sortby" class="fi-list"></i> Sort By</button>
+                <div class="grid container" id="dropdown" style="display:none;" onmouseleave="mouseleave();">
+                    <div class="grid-y" id="mydropdown" >
+                        <div class="cell">
+                            <button class="button" type="button" onclick="last_ascending();">
+                                <i class="fi-arrow-down"></i> Last Name</button>
+                        </div>
+                        <div class="cell" style="margin-top:39px;">
+                            <button class="button" type="button" onclick="last_descending();">
+                                <i class="fi-arrow-up"></i> Last Name</button>
+                        </div>
+                        <div class="cell" style="margin-top:78px;">
+                            <button class="button" type="button" onclick="first_ascending();">
+                                <i class="fi-arrow-down"></i> First Name</button>
+                        </div>
+                        <div class="cell" style="margin-top:117px;">
+                            <button class="button" type="button" onclick="first_descending();">
+                                <i class="fi-arrow-up"></i> First Name</button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        </div>
+        <div class="top-bar-right" style="margin-top:2px;">
+            <ul class="menu">
+            <li><input type="search" id="search_student" placeholder="Search" style="min-width:20px;max-width:160px;"></li>
+            <li><button type="button" class="button"><i class="fi-magnifying-glass"></i></button></li>
+            </ul>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid-x grid-padding-x align-center-middle" style="margin-top:10px;">
+    <div class="cell large-8">
+        <div class="grid-x align-center text-center" style="margin-top:8px;">
+            <div class="cell auto" style="color:black;background:#5aacfe;margin-left:4px;margin-right:4px;">Name</div>
+            <div class="cell auto" style="color:black;background:#5aacfe;margin-left:4px;margin-right:4px;">Email</div>
+            <div class="cell auto" style="color:black;background:#5aacfe;margin-left:4px;margin-right:4px;">Phone Number</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid-x grid-padding-x align-center-middle" id="all_students" style="margin-top:10px;margin-bottom:40px;">
+    <div class="cell large-8" id="student_list">
+        {% for d in data %}
+            <form id="form_student_info" method="POST"> <!-- Each button is a different form -->
+                <input name="studentid" type="hidden" value="{{d[0]}}" />
+                <div class="hollow button primary expanded" style="color:#000;" name="individuals"
+                    onclick="this.parentNode.submit()">
+                    <div class="grid-x grid-padding-x align-center-middle text-center">
+                        <div class="cell auto">{{d[2]}}, {{d[1]}}</div>
+                        <div class="cell auto" style="word-break:break-all;">{{d[4]}}</div>
+                        <div class="cell auto" style="word-break:break-word;">{{d[5]}}</div>
+                    </div>
+
+                </div>
+            </form>
+        {% endfor %}
+    </div>
+    <div class="cell large-8" id="delete_list">
+        <form id="form_delete" method="POST">
+        </form>
+        {% for d in data %}
+            <div class="boxes"  name="checkboxes">
+                <input type="checkbox" name="delete" id="{{d[0]}}" value="{{d[0]}}" form="form_delete" />
+                <label for="{{d[0]}}">
+                    <div class="grid-x grid-padding-x align-center-middle text-center"
+                         style="padding-top:4px;padding-bottom:5px;">
+                        <div class="cell auto" style="padding-left:18px;">{{d[2]}}, {{d[1]}}</div>
+                        <div class="cell auto" style="word-break:break-all;">{{d[4]}}</div>
+                        <div class="cell auto" style="padding-right:18px;">{{d[5]}}</div>
+                    </div>
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<div class="grid-x grid-padding-x align-center-middle" id="confirm" style="display:none;">
+    <div class="cell large-8" style="position:fixed;bottom:0;">
+
+        <button class="button" type="submit" name="confirm" form="form_delete"
+        style="float:right;margin-right:14px;border:0;"><i class="fi-trash"></i> Delete</button>
+        <button class="button secondary hollow" type="button" onclick="cancel_delete();" 
+            style="float:right;background-color:white;border:0;margin-right:4px;">
+            <i class="fi-x"></i> Cancel</button><!-- This empty div with a float:left is the only way that the following
+        button with float:right works. The float:right does not seem to work with only one element-->
+        <button class="button secondary hollow" type="button" onclick="clear_checkboxes();" 
+            style="float:right;background-color:white;border:0;margin-right:4px;">
+            <i class="fi-page"></i> Clear</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+data = {{data|tojson}}
+
+// This block performs a text search on the div items of #available students
+    $('#search_student').keyup( function() {
+        let $rows;
+        if (document.getElementById('toggle').checked) {
+            $rows = $('#delete_list div');
+        }
+        else {
+            $rows = $('#student_list div');
+        }
+        let val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        $rows.show().filter( function() {
+            let text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+    });
+
+function toggle() {
+    // Show both lists again after pressing the toggle button, this is in case the search filter has hidden
+    // elements, and then the toggle button is activated
+    let $ss = $('#student_list div');
+    let $ds = $('#delete_list div');
+    $ss.show();
+    $ds.show();
+
+    let checkboxes = document.getElementsByName('checkboxes');
+    let individuals = document.getElementsByName('individuals');
+    if (document.getElementById('toggle').checked) {
+        for (let i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].style.display = "none";
+        }
+        for (let i = 0; i < checkboxes.length; i++) {
+            individuals[i].style.display = "block";
+        }
+        document.getElementById('confirm').style.display = "none";
+    } else {
+        for (let i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].style.display = "block";
+        }
+        for (let i = 0; i < checkboxes.length; i++) {
+            individuals[i].style.display = "none";
+        }
+        document.getElementById('confirm').style.display = "flex";
+    }
+}
+
+function cancel_delete() {
+    toggle();
+    clear_checkboxes();
+    document.getElementById('toggle').checked = false;
+}
+
+function clear_checkboxes() {
+    let checkboxes = document.getElementsByName('delete');
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+    }
+}
+
+function dropdown() {
+    if (document.getElementById('dropdown').style.display == "none")
+        document.getElementById('dropdown').style.display = "block";
+    else
+        document.getElementById('dropdown').style.display = "none";
+}
+
+function mouseleave() {
+    document.getElementById('dropdown').style.display = "none";
+}
+
+function last_ascending() {
+    data.sort(last_ascending_sort);
+    redraw();
+}
+
+function last_ascending_sort(a, b) {
+    if ( a[2] < b[2] ) return -1;
+    if ( a[2] > b[2] ) return 1;
+    return 0;
+}
+
+function last_descending() {
+    data.sort(last_descending_sort);
+    redraw();
+}
+
+function last_descending_sort(a, b) {
+    if ( a[2] < b[2] ) return 1;
+    if ( a[2] > b[2] ) return -1;
+    return 0;
+}
+
+function first_ascending() {
+    data.sort(first_ascending_sort);
+    redraw();
+}
+
+function first_ascending_sort(a, b) {
+    if ( a[1] < b[1] ) return -1;
+    if ( a[1] > b[1] ) return 1;
+    return 0;
+}
+
+function first_descending() {
+    data.sort(first_descending_sort);
+    redraw();
+}
+
+function first_descending_sort(a, b) {
+    if ( a[1] < b[1] ) return 1;
+    if ( a[1] > b[1] ) return -1;
+    return 0;
+}
+
+function redraw() {
+    // Remove all Child Nodes
+    let students_list = document.getElementById('student_list');
+    while (students_list.firstChild) {
+        students_list.removeChild(students_list.firstChild);
+    }
+    let delete_list = document.getElementById('delete_list');
+    while (delete_list.firstChild) {
+        delete_list.removeChild(delete_list.firstChild);
+    }
+    // Recreate divs
+    document.getElementById('delete_list').insertAdjacentHTML("afterbegin",
+        `<form id="form_delete" method="POST"></form>`
+    );
+    data.forEach( (datum) => {
+        document.getElementById('student_list').insertAdjacentHTML("beforeend",`<form id="form_student_info" method="POST">` +
+            `<input name="studentid" type="hidden" value="${datum[0]}" />` +
+            `<div class="hollow button primary expanded" style="color:#000;" name="individuals"`+
+            `onclick="this.parentNode.submit()">`+
+            `<div class="grid-x grid-padding-x align-center-middle text-center">`+
+            `<div class="cell auto">${datum[2]}, ${datum[1]}</div>`+
+            `<div class="cell auto" style="word-break:break-all;">${datum[4]}</div>`+
+            `<div class="cell auto" style="word-break:break-word;">${datum[5]}</div>`+
+            `</div></div></form>`);
+        document.getElementById('delete_list').insertAdjacentHTML("beforeend",
+            `<div class="boxes"  name="checkboxes">`+
+            `<input type="checkbox" name="delete" id="${datum[0]}" value="${datum[0]}" form="form_delete" />`+
+            `<label for="${datum[0]}">`+
+            `<div class="grid-x grid-padding-x align-center-middle text-center"`+
+            `style="padding-top:4px;padding-bottom:5px;">`+
+            `<div class="cell auto" style="padding-left:18px;">${datum[2]}, ${datum[1]}</div>`+
+            `<div class="cell auto" style="word-break:break-all;">${datum[4]}</div>`+
+            `<div class="cell auto" style="padding-right:18px;">${datum[5]}</div>`+
+            `</div></label></div>`
+        );
+    });
+}
+
+</script>
+
+{% endblock content %}

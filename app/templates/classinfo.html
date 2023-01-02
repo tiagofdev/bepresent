@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+
+<!-- Class Information -->
+<div class="grid-x grid-padding-x text-center align-center">
+	<div class="cell large-2"></div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Class</div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Time</div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Dates</div>
+	<div class="cell large-2"></div>
+</div>
+<div class="grid-x grid-padding-x text-center align-center" style="margin-top:-1px;">
+	<div class="cell large-2"></div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;">
+		{{data_s[1]}}<br>
+		{% if data_s[2] %}
+			<span style="font-weight:bold; margin:0;padding:0;">Su&nbsp</span>
+		{% endif %}
+
+		{% if data_s[3] %}
+			<span style="font-weight:bold;margin:0;padding:0;">Mo&nbsp</span>
+		{% endif %}
+		
+		{% if data_s[4] %}
+			<span style="font-weight:bold;margin:0;padding:0;">Tu&nbsp</span>
+		{% endif %}
+		
+		{% if data_s[5] %}
+			<span style="font-weight:bold;margin:0;padding:0;">We&nbsp</span>
+		{% endif %}
+		
+		{% if data_s[6] %}
+			<span style="font-weight:bold;margin:0;padding:0;">Th&nbsp</span>
+		{% endif %}
+		
+		{% if data_s[7] %}
+			<span style="font-weight:bold;margin:0;padding:0;">Fr&nbsp</span>
+		{% endif %}
+		
+		{% if data_s[8] %}
+			<span style="font-weight:bold;margin:0;padding:0;">Sa</span>
+		{% endif %}
+	</div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;">{{data_s[11]}}<br>{{data_s[12]}}</div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;">{{data_s[9]}}<br>{{data_s[10]}}</div>
+	<div class="cell large-2"></div>
+</div>
+
+<div class="grid-x grid-padding-x text-center align-center" style="margin-top:20px;">
+	<div class="cell large-2"></div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Students</div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Meetings</div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Next Meeting</div>
+	<div class="cell large-2"></div>
+</div>
+
+<div class="grid-x grid-padding-x text-center align-center" style="margin-top:-1px;">
+	<div class="cell large-2"></div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;">{{enrolled_students|length}}</div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;">{{dates|length}}</div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;" id="next_meeting"></div>
+	<div class="cell large-2"></div>
+</div>
+
+<!-- Class Stats -->
+<div class="grid-x grid-padding-x text-center align-center" style="margin-top:20px;">
+	<div class="cell large-2"></div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Status</div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Progress</div>
+	<div class="cell auto" style="background:#5aacfe;border:1px solid #1779ba;margin-left:4px;margin-right:4px;">Attendance Rate</div>
+	<div class="cell large-2"></div>
+</div>
+
+<div class="grid-x grid-padding-x text-center align-center" style="margin-top:-1px;">
+	<div class="cell large-2"></div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;" id="status"></div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;">{{progress_s}}%</div>
+	<div class="cell auto" style="border:1px solid #1779ba; margin-left:4px; margin-right:4px;">{{rate}}%</div>
+	<div class="cell large-2"></div>
+</div>
+
+<div class="grid-x grid-padding-x text-center align-center" style="margin-top:24px;">
+	<div class="cell large-8">
+		<div class="grid-x grid-padding-x text-center align-center">
+			<div class="cell large-8 medium-8 small-12" style="padding:0;padding-left:4px;padding-right:4px;">
+				<div class="grid-y grid-margin-y align-center">
+					<div class="cell" style="background:#5aacfe;margin-right:84px;">Attendance Dates</div>
+					<div class="cell">
+						<!-- Attendance Dates --> 
+						<div class="grid-x text-center">
+							{% for i in dates %}
+							<form method="POST">
+								<div class="cell">
+									<input name="date" type="hidden" value="{{i[0]}}">
+									<button class="hollow button secondary" id="{{i[0]}}" 
+										name="attendance_button" type="submit" style="width:64px;">
+									{{ i[0][5:] | replace("-","/") }}
+									</button>
+								</div>
+							</form>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="cell large-4 medium-4 small-12" style="padding:0;padding-left:4px;padding-right:4px;">
+				<div class="grid-y grid-margin-y align-center" >
+					<div class="cell large-2 medium-4" style="background:#5aacfe;">Students</div>
+					<div class="cell">
+						<!-- Students Enrolled --> 
+						<div class="cell large-2 medium-4">
+                            <div class="grid-x text-left" style="padding:4px;border:1px solid #1779ba;">
+                                {% if enrolled_students|length == 0 %}
+                                    No enrolled students
+                                    <br>
+                                {% else %}
+                                    {% for es in enrolled_students %}
+                                        {{es[1]}}<br>
+                                    {% endfor %}
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Menu bar options -->
+<div class="grid-x grid-padding-x align-center-middle" style="margin-top:20px;">
+    <div class="cell large-8">
+		<div class="top-bar">
+  			<div class="top-bar-left">
+				<form method="POST">
+					<ul class="menu">
+						<li style="margin-right:2px"><button class="button" type="submit" name="button_reports"><i class="fi-results"></i> Reports</button></li>
+						<li style="margin-right:2px"><button class="button" type="submit" name="edit_button"><i class="fi-page-edit"></i> Edit</button></li>
+						<li style="margin-right:2px"><button class="button" type="submit" name="button_delete"><i class="fi-trash"></i> Delete</button></li>
+					</ul>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+// This block determines the class status
+arr_S = {{data_s|tojson}};
+if (arr_S != null) {
+	if (arr_S[13] == 0) {document.getElementById('status').innerHTML = "Open";}
+	else if (arr_S[13] == 1) {document.getElementById('status').innerHTML = "Upcoming";}
+	else {document.getElementById('status').innerHTML = "Past";}
+}
+
+var today = new Date();
+today.setHours(0,0,0,0);
+
+dates = {{dates|tojson}}
+var next_meeting = "";
+var next_meeting_flag = true;
+
+// This block loops through dates and colors the buttons according to status
+for (var x = 0 ; x < dates.length ; x++) {
+	
+	let parts = dates[x];
+	let date = new Date( parts[0].slice(0,4), parts[0].slice(5,7)-1, parts[0].slice(8,10) );
+
+	// This block identifies the next meeting date
+	if ( date.getTime() === today.getTime() ) {
+		if (next_meeting_flag === true) {
+			next_meeting = dates[x][0];
+			next_meeting_flag = false;
+		}
+	}
+	if ( date.getTime() <= today.getTime() ) {
+		// if attendance has already been taken
+		if ( dates[x][1] === 1 ) {
+			// Color them blue
+			let z = document.getElementById(dates[x][0]);
+			z.style.backgroundColor = "#1779ba";
+			z.style.color = "black"
+		}
+	}
+	// If date is yet to come, then disable buttons and gray them out
+	else if ( date.getTime() > today.getTime() ) {
+		let z = document.getElementById(dates[x][0]);
+		z.disabled = true;
+		z.style.backgroundColor = "#606060";
+		z.style.color = "white";
+		if (next_meeting_flag === true) {
+			next_meeting = dates[x][0];
+			next_meeting_flag = false;
+		}
+	}
+}
+document.getElementById('next_meeting').innerHTML = next_meeting;
+
+</script>
+
+{% endblock content %}
+

@@ -1,0 +1,86 @@
+﻿<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <link rel="stylesheet" href="static/styles/foundation.css" />
+    <title>Be Present - The Attendance App</title>
+</head>
+<body style="background: linear-gradient(0deg, #fff, #69c 100%);
+    background-repeat: no-repeat;
+    background-size: auto 480px;"
+    OnLoad="document.login_form.form_username.focus();">
+    <center>
+        <div class="cell align-center">
+            <div class="cell" style="min-width:140px; max-width:320px;margin-top:8px;">
+                <h1 style="color:#0c3d5d;">Be Present</h1>
+                <img alt="Be Present Logo"
+                        src={{url_for('static', filename='images/logo9.svg')}} />
+            </div>
+            <form name="login_form" method="POST" autocomplete="off">
+                <div class="callout primary" style="min-width:140px; max-width:320px;
+                    border:2px solid black; padding-bottom:0;">
+                    <div class="grid-y" style="min-height: 200px;">
+                        <div class="cell shrink" style="background: #1779ba; width:111.3%;
+                            margin:-16px 0 0 -16px;padding:0;color:white;">
+                            <h5>Attendance App<br>for teachers</h5>
+                        </div>
+                        <div class="cell shrink">
+                            <h6 style="font-style:italic;">Take attendance, save data online and view reports</h6>
+                        </div>
+                        <div class="cell shrink">
+                            <input type="text" name="form_username" maxlength="30" pattern="[A-Za-z0-9]+"
+                                title="Only letters and numbers allowed" value="" required placeholder="username"
+                                oninput="this.value = this.value.replace(/[^0-9a-zA-Z]/g, '').replace(/(\..*)\./g, '$1');"
+                                onfocus="">
+                        </div>
+                        <div class="cell shrink">
+                            <input type="password" name="form_password" id="form_password" minlength="4" value="" required
+                                placeholder="password" oninput="this.value = this.value.replace(/\s/g, '');">
+                        </div>
+                        <div class="cell shrink">
+                            <div class="grid-x">
+                                <div class="cell-6" style="margin:0; padding:0;">
+                                    <input type="checkbox" id="visibility" onclick="toggle_visibility();">
+                                    <label for="visibility">Show Password</label>
+                                </div>
+                                <div class="cell auto" style="margin:0; padding:0;font-size:0.9em;">
+                                    Username: guest<br>Password: pass
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cell shrink" style="color:red;">
+                            {% if error %}
+                                <p><strong>Error:</strong> {{ error }}</p>
+                            {% endif %}
+                            {% if message %}
+                                <p>{{ message }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="cell shrink" style="margin:0.5em 0 0 0; padding: 0;">
+                            <div class="grid-x grid-padding-x">
+                                <div class="cell shrink text-left">
+                                    <input type="submit" name="button_signin" class="button" value="Sign in" />
+                                </div>
+                                <div class="cell auto text-right"><a href="signup">Sign up</a></div>
+                                {# <div class="cell auto text-right"><a href="">Forgot password?</a></div>#}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+    </center>
+</body>
+</html>
+
+<script type="text/javascript">
+    function toggle_visibility() {
+        let elem = this.document.getElementById('form_password');
+        if ( elem.type === "password" ) {
+            elem.type = "text";
+        } else {
+            elem.type = "password";
+        }
+    }
+</script>

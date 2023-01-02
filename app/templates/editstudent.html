@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="grid-x grid-padding-x align-center-middle" >
+    <div class="cell large-8">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <ul class="menu">
+                    <li class="menu-text">Edit Student</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form name="edit_student" id="edit_student_form" method="POST">
+<div class="grid-x grid-padding-x align-center" style="margin-top:10px;">
+    <div class="cell medium-8 large-6">
+        <div class="grid-y">
+            <div class="medium-6 cell">
+                <label>First Name
+                    <input type="text" name="name_first" id="name_first" placeholder="" pattern="[a-zA-Z]*"
+                    {% if si[1] %} value="{{si[1]}}"{% endif %} size="20" maxlength="24" required>
+                </label>
+            </div>
+            <div class="medium-6 cell">
+                <label>Last Name
+                    <input type="text" name="name_last" id="name_last" placeholder="" pattern="[a-zA-Z ]*"
+                    {% if si[2] %} value="{{si[2]}}"{% endif %} size="20" maxlength="24" required>
+                </label>
+                <p>
+            </div>
+            <p style="color:red;">{% if message %} {{message}} {% endif %}</p>
+            <div class="medium-6 cell">
+                <label>Date of Birth
+                    <input type="date" name="dob" id="dob" {% if si[3] %} value="{{si[3]}}"{% endif %}>
+                </label>
+            </div>
+            <p id="date_comparison" style="color:#f00;"></p>
+            
+            <div class="medium-6 cell">
+                <label>Email
+                    <input type="email" name="email" id="email" {% if si[4] %} value="{{si[4]}}"{% endif %}>
+                </label>
+            </div>
+
+            <div class="medium-6 cell">
+                <label>Phone Number
+                    <input type="tel" name="phone_number" id="phone_number" {% if si[5] %} value="{{si[5]}}"{% endif %}>
+                </label>
+            </div>
+            
+            <div class="grid-x grid-padding-x align-center-middle">
+                <div class="cell">
+                    <div class="top-bar">
+                        <div class="top-bar-right">
+                            <ul class="menu">
+                                <li><button type="button" class="button" onclick="resetform();" style="margin-right:20px;"><i class="fi-page"></i> Clear</button></li>
+                                <li><button type="button" class="button" onclick="history.back()" style="margin-right:20px;"><i class="fi-x"></i> Cancel</button></li>
+                                <li><button type="submit" class="button" name="save"><i class="fi-save"> Save</i></button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+
+<script>
+
+    function resetform() {
+        
+        document.getElementById('edit_student_form').reset();
+        
+        // Clears Class name textfield
+        document.getElementById('name_first').value = "";
+        document.getElementById('name_last').value = "";
+        document.getElementById('dob').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('phone_number').value = "";
+        
+    }
+
+</script>
+
+
+{% endblock content %}

@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="grid-x grid-padding-x align-center-middle">
+    <div class="cell large-8">
+        <div class="top-bar" style="margin-bottom:28px;background:#e6e6e6;">
+            <div class="top-bar-left">
+                <ul class="menu">
+                    <li class="menu-text">{{name}} - {{ atten_date_s | replace("-","/") }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid-x align-center">
+    <div class="cell large-8">
+        <form id="form_attendance" method="POST">
+            {% set counter = namespace(value=0) %}
+            {% for x in name_enrollment_s %}
+            {% if counter.value % 2 == 1 %}
+                <div class="grid-x grid-padding-x" style="margin: 0 20px 0 20px; padding:0.2em 0 0.2em 0;">
+            {% else %}
+                <div class="grid-x grid-padding-x" style="background:#e6e6e6;margin: 0 20px 0 20px;padding:0.2em 0 0.2em 0;">
+            {% endif %}
+                <div class="cell small-12 medium-4 large-4" style="font-weight:bold;padding-left:2em;">{{x[0]}}</div>
+                <div class="cell small-12 medium-8 large-8 align-center-middle right" style="margin:0;padding:0;">
+                    <div class="radios" style="width:320px;float:right;">
+                        {% if attendance_s[counter.value] == 'Absent' or attendance_s[counter.value] == None or attendance_s|length == 0 %}
+                        <input type="radio" id="{{x[1]}}1" name="{{x[1]}}" value="Absent" checked><label for="{{x[1]}}1">Absent</label>
+                        {% else %}
+                        <input type="radio" id="{{x[1]}}1" name="{{x[1]}}" value="Absent"><label for="{{x[1]}}1">Absent</label>
+                        {% endif %}
+                        {% if attendance_s[counter.value] == 'Present' %}
+                        <input type="radio" id="{{x[1]}}2" name="{{x[1]}}" value="Present" checked><label for="{{x[1]}}2">Present</label>
+                        {% else %}
+                        <input type="radio" id="{{x[1]}}2" name="{{x[1]}}" value="Present"><label for="{{x[1]}}2">Present</label>
+                        {% endif %}
+                        {% if attendance_s[counter.value] == 'Partial' %}
+                        <input type="radio" id="{{x[1]}}3" name="{{x[1]}}" value="Partial" checked><label for="{{x[1]}}3">Late</label>
+                        {% else%}
+                        <input type="radio" id="{{x[1]}}3" name="{{x[1]}}" value="Partial"><label for="{{x[1]}}3">Late</label>
+                        {% endif %}
+                        {% if attendance_s[counter.value] == 'Excused' %}
+                        <input type="radio" id="{{x[1]}}4" name="{{x[1]}}" value="Excused" checked><label for="{{x[1]}}4">Excused</label>
+                        {% else %}
+                        <input type="radio" id="{{x[1]}}4" name="{{x[1]}}" value="Excused"><label for="{{x[1]}}4">Excused</label>
+                        {% endif %}
+                    </div>
+                </div>                
+            </div>
+            {% set counter.value = counter.value + 1 %}
+            {% endfor %}
+            
+            <div class="grid-x grid-padding-x align-center-middle" style="padding:0;margin-top:20px;">
+                <div class="cell">
+                    <div class="top-bar">
+                        <div class="top-bar-right">
+                            <ul class="menu">
+                                <li><button type="button" class="button" onclick="revert();" style="margin-right:0.2em;"><i class="fi-page"></i> Clear</button></li>
+                                <li><button type="button" class="button" onclick="resetform();" style="margin-right:0.2em;"><i class="fi-refresh"></i> Reset</button></li>
+                                <li><button type="button" class="button" onclick="history.back()" style="margin-right:0.2em;"><i class="fi-x"></i> Cancel</button></li>
+                                <li><button type="submit" class="button" name="button_save"><i class="fi-save"></i> Save</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+function resetform() {
+    document.getElementById('form_attendance').reset();
+}
+
+function revert() {
+    x = {{ name_enrollment_s|tojson }};
+    for ( i = 0; i < x.length; i++ ) {
+        var id = x[i][1] + "1";
+        document.getElementById(id).checked = true;
+    }
+}
+
+</script>
+
+{% endblock content %}
