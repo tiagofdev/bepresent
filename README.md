@@ -1,3 +1,3 @@
 # bepresent
 Attendance WebApp for Teachers
-Python/Flask/MySQL/Foundation
+Python / Flask / MySQL / Foundation / JS
