@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import  render_template, request, redirect, url_for, flash, session
 from mysql_db import connect_DB
 
 
@@ -21,10 +21,12 @@ def take_attendance() :
     
     # Get all students enrolled in that class
     try:
+        # Get Name
         get_ss_query = """SELECT CONCAT_WS(', ',name_last,name_first) AS name FROM student WHERE id IN (
             SELECT student_id FROM enrollment WHERE class_id = %s)"""
         cursor.execute(get_ss_query,(class_id,))
         qres = cursor.fetchall()
+        # Get Enrollment Id
         cursor.execute("SELECT id FROM enrollment WHERE class_id = %s", (class_id,))
         qres2 = cursor.fetchall()
         # The two queries align names with their enrollment ids because they are both pulled by the same criteria ????
@@ -33,9 +35,12 @@ def take_attendance() :
             # qres[e] only has 1 element, for some reason, qres[e][0] does not work!
             for x in qres[e]:
                 name = x
+                print("name: %s",name)
             for x in qres2[e]:
                 id = x
+                print("id: %s",id)
             name_enrollment.append((name,id))
+
         # Sort the resulting array by last name ascending after matching with enrollment ids
         name_enrollment.sort()
         # get class name
@@ -78,30 +83,29 @@ def take_attendance() :
         
         if 'button_save' in request.form:
             
-            # Collect attendace from client
-            attendance_C = []
-            for i in name_enrollment:
-                attendance_C.append( (i[1], atten_date, request.form.get(str( i[1] )) ) )
+            # Collect attendance from client
+            attendance_Client = []
+            for item in name_enrollment:
+                attendance_Client.append( (item[1], atten_date, request.form.get(str( item[1] )) ) )
                 
             # If attendance has NOT already been taken
-            if attendance_C:
+            if attendance_Client:
                 if (taken == 0):
                     try:
-                        cursor.executemany("INSERT INTO attendance VALUES (%s,%s,%s)",(attendance_C))
+
                         # Set date as taken
                         cursor.execute("UPDATE class_dates SET taken = 1 WHERE (class_id = %s AND date = %s)",(class_id,atten_date))
                     except:
                         flash("Error saving attendance")
                         return redirect('error')
+                try:
+
+                    cursor.executemany("INSERT INTO attendance VALUES (%s,%s,%s) on duplicate key update status = values(status)",(attendance_Client))
+                except:
+                    flash("Error saving attendance")
+                    return redirect('error')
+
                 
-                # Otherwise update taken status only
-                else:
-                    try:
-                        for x in attendance_C:
-                            cursor.execute("UPDATE attendance SET status = %s WHERE (enrollment_id = %s AND date = %s)",(x[2],x[0],x[1]))
-                    except:
-                        flash("error updating attendance")
-                        return redirect('error')
                 mydb.commit()
             return redirect(url_for('classinfo'))
-    return render_template("attendance.html",  atten_date_s = atten_date, name_enrollment_s = name_enrollment, attendance_s = attendance_db, name = qres3[0])
+    return render_template("attendance.html",  atten_date_s=atten_date, name_enrollment_s = name_enrollment, attendance_s = attendance_db, name = qres3[0])
