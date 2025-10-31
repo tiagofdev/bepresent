@@ -51,7 +51,7 @@ The application follows a **client-server architecture**:
 
 - View List of Classes
 
-![view_classes.png](view_classes.png)
+![view_classes.png](images/view_classes.png)
 
 - View Class Information
 
